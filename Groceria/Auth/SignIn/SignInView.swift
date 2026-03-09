@@ -9,6 +9,8 @@ import SwiftUI
 
 struct SignInView: View {
     
+    @State private var goToForgetPassword = false
+    
     @State private var isClicked = false
     
     @State private var emailTextFieldText = ""
@@ -44,7 +46,7 @@ struct SignInView: View {
                     }
                     Spacer()
                     Button {
-                        
+                        goToForgetPassword = true
                     } label: {
                         Text("Forgot Password")
                             .foregroundStyle(.error)
@@ -124,6 +126,9 @@ struct SignInView: View {
             .navigationBarBackButtonHidden(true)
             .navigationDestination(isPresented: $goToSignup) {
                 RegisterView()
+            }
+            .navigationDestination(isPresented: $goToForgetPassword) {
+                forgotPassword()
             }
         }
     }
