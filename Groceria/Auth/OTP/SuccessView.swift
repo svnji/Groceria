@@ -41,7 +41,7 @@ struct SuccessView: View {
             .padding()
         }
         .navigationDestination(isPresented: $goToHome) {
-            HomeView()
+            CustomTabBar()
         }
     }
 }
