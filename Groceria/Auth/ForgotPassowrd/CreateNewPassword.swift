@@ -9,9 +9,10 @@ import SwiftUI
 
 struct CreateNewPassword: View {
     
+    @AppStorage("isLoggedIn") var isLoggedIn = false
+    
     @State var newPasswordText = ""
     @State var confirmPasswordText = ""
-    @State var goToHome = false
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
@@ -34,13 +35,13 @@ struct CreateNewPassword: View {
             K.AppTextField(title: "Confirm Password", placeHolder: "Enter new password", text: $confirmPasswordText)
             
             K.ButtonView(imageName: "", text: "Continue") {
-                goToHome = true
+                isLoggedIn = true
             }
         }
         Spacer()
-        .navigationDestination(isPresented: $goToHome) {
-            HomeView()
-        }
+        
+        
+        
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {

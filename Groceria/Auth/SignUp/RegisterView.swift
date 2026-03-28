@@ -11,11 +11,11 @@ struct RegisterView: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    @State private var firstNameTextFieldText = ""
-    @State private var lastNameTextFieldText = ""
-    @State private var emailTextFieldText = ""
-    @State private var passwordTextFieldText = ""
-    @State private var confirmPasswordTextFieldText = ""
+    @AppStorage("firstName") var firstNameTextFieldText: String = ""
+    @AppStorage("lastName") var lastNameTextFieldText: String = ""
+    @State  var emailTextFieldText = ""
+    @State  var passwordTextFieldText = ""
+    @State  var confirmPasswordTextFieldText = ""
 
     @State private var goToLogin = false
     @State private var goToOtp = false
@@ -63,7 +63,21 @@ struct RegisterView: View {
                 }
 
                 K.ButtonView(imageName: "", text: "Sign Up") {
-                    goToOtp = true
+                    
+                    AuthManager.shared.signUp(
+                           email: emailTextFieldText,
+                           password: passwordTextFieldText
+                       ) { result in
+
+                           switch result {
+                           case .success(let user):
+                               print("User created:", user.uid)
+                               goToOtp = true
+
+                           case .failure(let error):
+                               print(error.localizedDescription)
+                           }
+                       }
                 }
 
                 HStack(spacing: 4) {

@@ -9,132 +9,145 @@ import SwiftUI
 
 struct SignInView: View {
     
+    @AppStorage("isLoggedIn") var isLoggedIn = false
+    @AppStorage("firstName") var firstName: String = ""
+    @AppStorage("lastName") var lastName: String = ""
+    
     @State private var goToForgetPassword = false
+    @State private var goToSignup = false
+    @State private var goToHome = false
     
     @State private var isClicked = false
-    
     @State private var emailTextFieldText = ""
-    
     @State private var passwordTextFieldText = ""
     
-    @State private var goToSignup = false
-    
     var body: some View {
-        ScrollView {
-            VStack {
-                Text("Sign In")
-                    .font(.custom("PlusJakartaSans-Bold", size: 18))
-                    .padding(43)
-                
-                K.AppTextField(title: "Email Address", placeHolder: "Enter your email address", text: $emailTextFieldText)
-                
-                K.AppTextField(title: "Password", placeHolder: "Enter your password", text: $passwordTextFieldText)
-                
-                HStack {
-                    HStack {
-                        Image(systemName:
-                                isClicked ? "checkmark.circle.fill" : "circle"
-                        )
-                        .foregroundStyle(.primaryApp)
-                        .onTapGesture {
-                            isClicked.toggle()
-                        }
-                        
-                        Text("Remember Me")
-                            .font(.custom("PlusJakartaSans-SemiBold", size: 14))
-                            .foregroundStyle(.grayScale70)
-                    }
-                    Spacer()
-                    Button {
-                        goToForgetPassword = true
-                    } label: {
-                        Text("Forgot Password")
-                            .foregroundStyle(.error)
-                            .font(.custom("PlusJakartaSans-SemiBold", size: 14))
-                    }
-                    
-                }
-                .padding(.horizontal, 24)
-                
-                K.ButtonView(imageName: "", text: "Sign In") {
-                    
-                }
-                
-                
-                HStack {
-                    Rectangle()
-                        .frame(width: 62, height: 2)
-                    Text("Or continue with")
-                    Rectangle()
-                        .frame(width: 62, height: 2)
-                }
-                .foregroundStyle(.gray)
-                .padding(.horizontal)
-                
+            ScrollView {
                 VStack {
-                    Button {
-                        
-                    } label: {
+                    Text("Sign In")
+                        .font(.custom("PlusJakartaSans-Bold", size: 18))
+                        .padding(43)
+                    
+                    K.AppTextField(title: "Email Address", placeHolder: "Enter your email address", text: $emailTextFieldText)
+                    
+                    K.AppTextField(title: "Password", placeHolder: "Enter your password", text: $passwordTextFieldText)
+                    
+                    HStack {
                         HStack {
-                            Image("GoogleLogo")
-                            Text("Continue with Google")
+                            Image(systemName:
+                                    isClicked ? "checkmark.circle.fill" : "circle"
+                            )
+                            .foregroundStyle(.primaryApp)
+                            .onTapGesture {
+                                isClicked.toggle()
+                            }
+                            
+                            Text("Remember Me")
+                                .font(.custom("PlusJakartaSans-SemiBold", size: 14))
+                                .foregroundStyle(.grayScale70)
                         }
-                        .foregroundColor(.black)
-                        .frame(maxWidth: .infinity)
+                        Spacer()
+                        Button {
+                            goToForgetPassword = true
+                        } label: {
+                            Text("Forgot Password")
+                                .foregroundStyle(.error)
+                                .font(.custom("PlusJakartaSans-SemiBold", size: 14))
+                        }
+                    }
+                    .padding(.horizontal, 24)
+                    
+                    K.ButtonView(imageName: "", text: "Sign In") {
+                        AuthManager.shared.signIn(
+                            email: emailTextFieldText,
+                            password: passwordTextFieldText
+                        ) { result in
+                            switch result {
+                            case .success(let user):
+                                print("Logged in:", user.uid)
+                                
+                                // Save names if needed
+                                // firstName = "John" // Example
+                                // lastName = "Doe"   // Example
+                                
+                                isLoggedIn = true
+                                goToHome = true
+                                
+                            case .failure(let error):
+                                print(error.localizedDescription)
+                            }
+                        }
+                    }
+                    
+                    HStack {
+                        Rectangle()
+                            .frame(width: 62, height: 2)
+                        Text("Or continue with")
+                        Rectangle()
+                            .frame(width: 62, height: 2)
+                    }
+                    .foregroundStyle(.gray)
+                    .padding(.horizontal)
+                    
+                    VStack {
+                        Button {
+                        } label: {
+                            HStack {
+                                Image("GoogleLogo")
+                                Text("Continue with Google")
+                            }
+                            .foregroundColor(.black)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(
+                                RoundedRectangle(cornerRadius: 24)
+                                    .strokeBorder(.black)
+                            )
+                        }
                         .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: 24)
-                                .strokeBorder(.black)
-                        )
+                        
+                        Button {
+                        } label: {
+                            HStack {
+                                Image("AppleLogo")
+                                Text("Continue with Apple")
+                            }
+                            .foregroundColor(.black)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(
+                                RoundedRectangle(cornerRadius: 24)
+                                    .strokeBorder(.black)
+                            )
+                            .padding(.horizontal)
+                        }
+                    }
+                    .padding(.vertical)
+                    
+                    HStack(spacing: 4) {
+                        Text("Don't have an account?")
+                            .foregroundStyle(.gray)
+                        
+                        Button("Sign Up") {
+                            goToSignup = true
+                        }
+                        .foregroundStyle(.primaryApp)
                     }
                     .padding()
-                    
-                    Button {
-                        
-                    } label: {
-                        HStack {
-                            Image("AppleLogo")
-                            Text("Continue with Apple")
-                        }
-                        .foregroundColor(.black)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: 24)
-                                .strokeBorder(.black)
-                        )
-                        .padding(.horizontal)
-                    }
-                    
                 }
-                .padding(.vertical)
-                
-                
-                HStack(spacing: 4) {
-                    Text("Don't have an account?")
-                        .foregroundStyle(.gray)
-                    
-                    Button("Sign Up") {
-                        goToSignup = true
-                    }
-                    .foregroundStyle(.primaryApp)
+                .navigationBarBackButtonHidden(true)
+                .navigationDestination(isPresented: $goToSignup) {
+                    RegisterView()
                 }
-                .padding()
-                
-                
-            }
-            .navigationBarBackButtonHidden(true)
-            .navigationDestination(isPresented: $goToSignup) {
-                RegisterView()
-            }
-            .navigationDestination(isPresented: $goToForgetPassword) {
-                forgotPassword()
+                .navigationDestination(isPresented: $goToForgetPassword) {
+                    forgotPassword()
+                }
+                .navigationDestination(isPresented: $goToHome) {
+                    HomeView()
+                }
             }
         }
     }
-}
-
-
 
 #Preview {
     SignInView()

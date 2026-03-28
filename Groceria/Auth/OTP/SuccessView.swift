@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct SuccessView: View {
-    @State var goToHome = false
+
+    @AppStorage("isLoggedIn") var isLoggedIn = false
+    
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 16)
@@ -31,7 +33,7 @@ struct SuccessView: View {
                 
                 
                 K.ButtonView(imageName: "", text: "Continue") {
-                    goToHome = true
+                    isLoggedIn = true
                 }
                 .padding(.horizontal, 34)
                 
@@ -39,9 +41,6 @@ struct SuccessView: View {
                     
             }
             .padding()
-        }
-        .navigationDestination(isPresented: $goToHome) {
-            CustomTabBar()
         }
     }
 }

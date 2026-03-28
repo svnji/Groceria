@@ -10,21 +10,26 @@ import SwiftUI
 struct HomeView: View {
     
     @State var currentPage = 0
+    
+    @AppStorage("firstName") var firstName: String = ""
+    @AppStorage("lastName") var lastName: String = ""
+    
     let columns = [GridItem(.flexible()), GridItem(.flexible())]
     
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 20) {
                 
+                // MARK: - Welcoming
                 HStack {
                     Image("profilePic")
                     
-                    VStack {
-                        Text("Welcom Back")
+                    VStack(alignment: .leading) {
+                        Text("Welcome Back")
                             .font(.custom("PlusJakartaSans-SemiBold", size: 14))
                             .foregroundStyle(.grayScale70)
                         
-                        Text("Vicky Gulgowski")
+                        Text("\(firstName) \(lastName)")
                             .font(.custom("PlusJakartaSans-Regular", size: 24))
                     }
                     
@@ -38,6 +43,7 @@ struct HomeView: View {
                 }
                 .padding(24)
                 
+                // MARK: - Ads TabView
                 VStack {
                     TabView(selection: $currentPage) {
                         HomeTabViewPage().tag(0)
@@ -65,6 +71,7 @@ struct HomeView: View {
                     .padding(.horizontal)
                 }
                 
+                // MARK: - Categories
                 VStack {
                     HStack {
                         Text("Categories")
@@ -72,8 +79,7 @@ struct HomeView: View {
                         
                         Spacer()
                         
-                        Button {
-                        } label: {
+                        NavigationLink(value: ShopRoute.categories) {
                             Text("See All")
                                 .foregroundStyle(.primaryApp)
                                 .font(.custom("PlusJakartaSans-Medium", size: 12))
@@ -83,12 +89,16 @@ struct HomeView: View {
                     
                     HStack(spacing: 22) {
                         ItemView(imageName: "Vegetables", name: "Vegetables")
-                        ItemView(imageName: "Fruits", name: "Fruits")
+                        NavigationLink(value: ShopRoute.fruits) {
+                            ItemView(imageName: "Fruits", name: "Fruits")
+                        }
+                        .buttonStyle(.plain)
                         ItemView(imageName: "Meat", name: "Meat")
                         ItemView(imageName: "Dairy", name: "Dairy")
                     }
                 }
                 
+                // MARK: - Best Seller
                 VStack(spacing: 12) {
                     HStack {
                         Text("Best Seller")
@@ -112,10 +122,18 @@ struct HomeView: View {
                     }
                     .padding(.horizontal)
                 }
-                
             }
             .padding(.vertical)
         }
+        .navigationDestination(for: ShopRoute.self) { route in
+            switch route {
+            case .categories:
+                CategoryView()
+            case .fruits:
+                FruitsView()
+            }
+        }
+        .navigationBarBackButtonHidden(true)
     }
 }
 
@@ -144,7 +162,8 @@ struct BestSellerItemView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             ZStack {
-                RoundedRectangle(cornerRadius: 12) .frame(width: 154, height: 146)
+                RoundedRectangle(cornerRadius: 12)
+                    .frame(width: 154, height: 146)
                 
                 Image("EurekaLemon")
             }
@@ -165,7 +184,6 @@ struct BestSellerItemView: View {
                 Text("/Kg")
                     .font(.custom("PlusJakartaSans-Medium", size: 12))
                     .foregroundStyle(.grayScale70)
-                
                 
                 Button {
                 } label: {

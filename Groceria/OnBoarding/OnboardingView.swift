@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct OnboardingView: View {
+    
+    @AppStorage("hasOnboarded") var hasOnboarded = false
+    
     @State private var goToRegister = false
     @State private var goSignIn: Bool = false
     @State private var currentPage = 0
@@ -28,7 +31,6 @@ struct OnboardingView: View {
     }
     
     var body: some View {
-        NavigationStack {
             
             VStack(alignment: .leading, spacing: 16) {
                 
@@ -131,12 +133,12 @@ struct OnboardingView: View {
                 }
             }
         }
-    }
     func contiune() {
         if currentPage < 2 {
             currentPage += 1
         } else {
             goSignIn = true
+            hasOnboarded = true
         }
     }
 }

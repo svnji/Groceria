@@ -7,6 +7,11 @@
 
 import SwiftUI
 
+enum ShopRoute: Hashable {
+    case categories
+    case fruits
+}
+
 struct K{
     
     struct AppTextField: View {
@@ -63,9 +68,10 @@ struct K{
                 .foregroundStyle(.black)
                 .font(.headline)
                 .padding(20)
-                .background(.grayScale40)
-                .clipShape(Circle())
+                .background(.grayScale30)
+                .clipShape(Circle()).frame(width: 48, height: 48)
         }
     }
     
 }
+
