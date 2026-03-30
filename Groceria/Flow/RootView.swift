@@ -10,6 +10,11 @@ import FirebaseAuth
 
 struct RootView: View {
 
+    // REVIEW:
+    // `HomeView` expects `@EnvironmentObject private var vm: HomeViewModel`.
+    // So RootView must create the VM once and inject it via `.environmentObject(...)`.
+    @StateObject private var vm = HomeViewModel()
+    
     @AppStorage("hasOnboarded") private var hasOnboarded = false
     @AppStorage("isLoggedIn") private var isLoggedIn = false
 
@@ -24,5 +29,7 @@ struct RootView: View {
             }
         }
         .animation(.easeInOut, value: isLoggedIn)
+        // REVIEW: make the VM available to child views.
+        .environmentObject(vm)
     }
 }

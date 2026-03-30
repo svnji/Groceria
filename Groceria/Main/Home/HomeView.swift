@@ -9,6 +9,8 @@ import SwiftUI
 
 struct HomeView: View {
     
+    @EnvironmentObject private var vm: HomeViewModel
+    
     @State var currentPage = 0
     
     @AppStorage("firstName") var firstName: String = ""
@@ -116,8 +118,19 @@ struct HomeView: View {
                     .padding(.horizontal)
                     
                     LazyVGrid(columns: columns, spacing: 16) {
-                        ForEach(0..<10) { _ in
-                            BestSellerItemView()
+                        // REVIEW:
+                        // [USER WRONG] Previously this grid used a fixed `0..<10` loop and
+                        // showed static `BestSellerItemView()` content, so it couldn't show real products.
+                        // [CURSOR FIX] Drive the grid from `vm.allProducts` and show `ProgressView` while loading.
+                        if vm.allProducts.isEmpty {
+                            ProgressView()
+                                .gridCellColumns(2)
+                                .padding(.vertical, 24)
+                        } else {
+                            ForEach(Array(vm.allProducts.enumerated()), id: \.offset) { _, product in
+                                // REVIEW: `BestSellerItemView` now receives the API product model.
+                                BestSellerItemView(product: product)
+                            }
                         }
                     }
                     .padding(.horizontal)
@@ -159,29 +172,69 @@ struct ItemView: View {
 }
 
 struct BestSellerItemView: View {
+    // REVIEW:
+    // Static best-seller UI changed to be dynamic.
+    // This view now renders values from the decoded `ProductModel`.
+    let product: ProductModel
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             ZStack {
                 RoundedRectangle(cornerRadius: 12)
                     .frame(width: 154, height: 146)
                 
-                Image("EurekaLemon")
+                Group {
+                    if let url = product.resolvedImageURL {
+                        AsyncImage(url: url) { phase in
+                            switch phase {
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .scaledToFit()
+                                    .padding(8)
+                            case .failure:
+                                Image("EurekaLemon")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .padding(8)
+                            case .empty:
+                                ProgressView()
+                            @unknown default:
+                                EmptyView()
+                            }
+                        }
+                    } else {
+                        Image("EurekaLemon")
+                            .resizable()
+                            .scaledToFit()
+                            .padding(8)
+                    }
+                }
             }
             
             VStack(alignment: .leading) {
-                Text("Eureka Lemon")
+                Text(product.name ?? "Product")
                     .font(.custom("PlusJakartaSans-Medium", size: 16))
+                    .lineLimit(2)
                 
-                Text("145 Sold")
-                    .font(.custom("PlusJakartaSans-Regular", size: 12))
-                    .foregroundStyle(.grayScale80)
+                // REVIEW:
+                // If your API field for "sold" is different than `rate_count`,
+                // update this line to use the correct model property.
+                if let sold = product.rateCount, sold > 0 {
+                    Text("\(sold) Sold")
+                        .font(.custom("PlusJakartaSans-Regular", size: 12))
+                        .foregroundStyle(.grayScale80)
+                } else {
+                    Text(" ")
+                        .font(.custom("PlusJakartaSans-Regular", size: 12))
+                }
             }
             
             HStack(spacing: 4) {
-                Text("$12.00")
+                Text(product.displayPrice)
                     .font(.custom("PlusJakartaSans-Bold", size: 14))
                 
-                Text("/Kg")
+                Text("/\(product.unit?.name ?? "Kg")")
                     .font(.custom("PlusJakartaSans-Medium", size: 12))
                     .foregroundStyle(.grayScale70)
                 
@@ -203,4 +256,5 @@ struct BestSellerItemView: View {
 
 #Preview {
     HomeView()
+        .environmentObject(HomeViewModel())
 }
