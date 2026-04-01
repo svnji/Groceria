@@ -9,25 +9,25 @@ import SwiftUI
 
 struct CustomTabBar: View {
     
-    @State var index = 0
+    @StateObject private var vm = CustomTabBarViewModel()
     
     var body: some View {
         ZStack{
             
-            if self.index == 0 {
+            if vm.index == 0 {
                 HomeView()
-            } else if self.index == 1 {
+            } else if vm.index == 1 {
                 DiscoveryView()
-            } else if self.index == 2 {
+            } else if vm.index == 2 {
                 ItemsView()
-            } else if self.index == 3 {
+            } else if vm.index == 3 {
                 MessageView()
-            } else if self.index == 4 {
+            } else if vm.index == 4 {
                 ProfileView()
             }
         }
         .navigationBarBackButtonHidden(true)
-        CustomTaps(index: self.$index)
+        CustomTaps(index: $vm.index)
     }
 }
 

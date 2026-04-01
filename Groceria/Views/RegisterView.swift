@@ -13,9 +13,7 @@ struct RegisterView: View {
 
     @AppStorage("firstName") var firstNameTextFieldText: String = ""
     @AppStorage("lastName") var lastNameTextFieldText: String = ""
-    @State  var emailTextFieldText = ""
-    @State  var passwordTextFieldText = ""
-    @State  var confirmPasswordTextFieldText = ""
+    @StateObject private var vm = RegisterViewModel()
 
     @State private var goToLogin = false
     @State private var goToOtp = false
@@ -46,38 +44,28 @@ struct RegisterView: View {
                     K.AppTextField(
                         title: "Email",
                         placeHolder: "Enter your email",
-                        text: $emailTextFieldText
+                        text: $vm.email
                     )
 
                     K.AppTextField(
                         title: "Password",
                         placeHolder: "Enter your password",
-                        text: $passwordTextFieldText
+                        text: $vm.password
                     )
 
                     K.AppTextField(
                         title: "Confirm Password",
                         placeHolder: "Enter your password",
-                        text: $confirmPasswordTextFieldText
+                        text: $vm.confirmPassword
                     )
                 }
 
                 K.ButtonView(imageName: "", text: "Sign Up") {
-                    
-                    AuthManager.shared.signUp(
-                           email: emailTextFieldText,
-                           password: passwordTextFieldText
-                       ) { result in
-
-                           switch result {
-                           case .success(let user):
-                               print("User created:", user.uid)
-                               goToOtp = true
-
-                           case .failure(let error):
-                               print(error.localizedDescription)
-                           }
-                       }
+                    vm.signUp { success in
+                        if success {
+                            goToOtp = true
+                        }
+                    }
                 }
 
                 HStack(spacing: 4) {

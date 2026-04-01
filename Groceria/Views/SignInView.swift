@@ -17,9 +17,7 @@ struct SignInView: View {
     @State private var goToSignup = false
     @State private var goToHome = false
     
-    @State private var isClicked = false
-    @State private var emailTextFieldText = ""
-    @State private var passwordTextFieldText = ""
+    @StateObject private var vm = SignInViewModel()
     
     var body: some View {
             ScrollView {
@@ -28,18 +26,18 @@ struct SignInView: View {
                         .font(.custom("PlusJakartaSans-Bold", size: 18))
                         .padding(43)
                     
-                    K.AppTextField(title: "Email Address", placeHolder: "Enter your email address", text: $emailTextFieldText)
+                    K.AppTextField(title: "Email Address", placeHolder: "Enter your email address", text: $vm.email)
                     
-                    K.AppTextField(title: "Password", placeHolder: "Enter your password", text: $passwordTextFieldText)
+                    K.AppTextField(title: "Password", placeHolder: "Enter your password", text: $vm.password)
                     
                     HStack {
                         HStack {
                             Image(systemName:
-                                    isClicked ? "checkmark.circle.fill" : "circle"
+                                    vm.isRememberMeEnabled ? "checkmark.circle.fill" : "circle"
                             )
                             .foregroundStyle(.primaryApp)
                             .onTapGesture {
-                                isClicked.toggle()
+                                vm.toggleRememberMe()
                             }
                             
                             Text("Remember Me")
@@ -58,23 +56,10 @@ struct SignInView: View {
                     .padding(.horizontal, 24)
                     
                     K.ButtonView(imageName: "", text: "Sign In") {
-                        AuthManager.shared.signIn(
-                            email: emailTextFieldText,
-                            password: passwordTextFieldText
-                        ) { result in
-                            switch result {
-                            case .success(let user):
-                                print("Logged in:", user.uid)
-                                
-                                // Save names if needed
-                                // firstName = "John" // Example
-                                // lastName = "Doe"   // Example
-                                
+                        vm.signIn { success in
+                            if success {
                                 isLoggedIn = true
                                 goToHome = true
-                                
-                            case .failure(let error):
-                                print(error.localizedDescription)
                             }
                         }
                     }
@@ -147,7 +132,7 @@ struct SignInView: View {
                 }
             }
         }
-    }
+}
 
 #Preview {
     SignInView()

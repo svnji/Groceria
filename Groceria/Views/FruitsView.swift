@@ -11,44 +11,21 @@ struct FruitsView: View {
     
     @Environment(\.dismiss) private var dismiss
 
-    
-    let categories = ["All Fruits", "Apple", "Banana"]
-    
-    let fruits: [(String, String, String, String)] = {
-        var array: [(String, String, String, String)] = []
-        for _ in 0..<10 {
-            array.append(("Honeycrisp Apple", "Apple", "1.5K Sold", "$12.00 /Kg"))
-            array.append(("Cavendish Banana", "Banana", "1.5K Sold", "$20.00 /Kg"))
-        }
-        return array
-    }()
-    
-    @State private var searchText = ""
-    @State private var selectedCategory: String = "All Fruits"
-
-    // Filter fruits by category and search text
-    var filteredFruits: [(String, String, String, String)] {
-        fruits.filter { fruit in
-            // Filter by category
-            (selectedCategory == "All Fruits" || fruit.1 == selectedCategory) &&
-            // Filter by search text
-            (searchText.isEmpty || fruit.0.localizedCaseInsensitiveContains(searchText))
-        }
-    }
+    @StateObject private var vm = FruitsViewModel()
 
     var body: some View {
         VStack(spacing: 0) {
-            K.AppTextField(title: "", placeHolder: "Search...", text: $searchText)
+            K.AppTextField(title: "", placeHolder: "Search...", text: $vm.searchText)
                 
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
-                    ForEach(categories, id: \.self) { category in
+                    ForEach(vm.categories, id: \.self) { category in
                         FruitsButtonView(
                             text: category,
-                            isSelected: selectedCategory == category
+                            isSelected: vm.selectedCategory == category
                         ) {
-                            selectedCategory = category
+                            vm.selectCategory(category)
                         }
                     }
                 }
@@ -66,8 +43,8 @@ struct FruitsView: View {
             
             ScrollView {
                 VStack(spacing: 12) {
-                    ForEach(filteredFruits.indices, id: \.self) { index in
-                        let fruit = filteredFruits[index]
+                    ForEach(vm.filteredFruits.indices, id: \.self) { index in
+                        let fruit = vm.filteredFruits[index]
                         FruitCardView(
                             name: fruit.0,
                             imageName: fruit.1,

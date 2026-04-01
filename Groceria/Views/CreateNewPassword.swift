@@ -11,8 +11,7 @@ struct CreateNewPassword: View {
     
     @AppStorage("isLoggedIn") var isLoggedIn = false
     
-    @State var newPasswordText = ""
-    @State var confirmPasswordText = ""
+    @StateObject private var vm = CreateNewPasswordViewModel()
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
@@ -30,12 +29,14 @@ struct CreateNewPassword: View {
             }
             .padding(.vertical, 50)
             
-            K.AppTextField(title: "New Password", placeHolder: "Enter new password", text: $newPasswordText)
+            K.AppTextField(title: "New Password", placeHolder: "Enter new password", text: $vm.newPasswordText)
             
-            K.AppTextField(title: "Confirm Password", placeHolder: "Enter new password", text: $confirmPasswordText)
+            K.AppTextField(title: "Confirm Password", placeHolder: "Enter new password", text: $vm.confirmPasswordText)
             
             K.ButtonView(imageName: "", text: "Continue") {
-                isLoggedIn = true
+                if vm.canContinue {
+                    isLoggedIn = true
+                }
             }
         }
         Spacer()

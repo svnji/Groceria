@@ -13,21 +13,9 @@ struct OnboardingView: View {
     
     @State private var goToRegister = false
     @State private var goSignIn: Bool = false
-    @State private var currentPage = 0
+    @StateObject private var vm = OnboardingViewModel()
     var isLastPage: Bool {
-        currentPage == 2
-    }
-    var subTitle: String {
-        switch currentPage {
-        case 0:
-            return "Convenience for Your Everyday Essentials"
-        case 1:
-            return "Effortless Access to Daily Necessities"
-        case 2:
-            return "Daily Grocery Needs, Just a Tap Away"
-        default:
-            return "Convenience for Your Everyday Essentials"
-        }
+        vm.isLastPage
     }
     
     var body: some View {
@@ -41,7 +29,7 @@ struct OnboardingView: View {
                     .padding()
                 
                 // MARK: - Subtitle
-                Text(subTitle)
+                Text(vm.subTitle)
                     .font(.custom("PlusJakartaSans-Bold", size: 30))
                     .foregroundStyle(.black)
                     .multilineTextAlignment(.leading)
@@ -59,22 +47,22 @@ struct OnboardingView: View {
                     ForEach(0..<3) { index in
                         Capsule()
                             .fill(
-                                index == currentPage
+                                index == vm.currentPage
                                 ? Color.primaryApp
                                 : Color.gray.opacity(0.3)
                             )
                             .frame(
-                                width: index == currentPage ? 20 : 6,
+                                width: index == vm.currentPage ? 20 : 6,
                                 height: 6
                             )
-                            .animation(.easeInOut, value: currentPage)
+                            .animation(.easeInOut, value: vm.currentPage)
                     }
                 }
                 .padding(.horizontal)
                 
                 
                 // MARK: - Onboarding Pages
-                TabView(selection: $currentPage) {
+                TabView(selection: $vm.currentPage) {
                     OnboardingPage(imageName: "onboarding1")
                         .tag(0)
                     
@@ -95,7 +83,7 @@ struct OnboardingView: View {
                         // MARK: - Continue / Get Started Button
                         Button {
                             withAnimation(.spring()) {
-                                contiune()
+                                continueFlow()
                             }
                         } label: {
                             Text(isLastPage ? "Get Started" : "Continue")
@@ -133,12 +121,13 @@ struct OnboardingView: View {
                 }
             }
         }
-    func contiune() {
-        if currentPage < 2 {
-            currentPage += 1
-        } else {
+
+    func continueFlow() {
+        if vm.isLastPage {
             goSignIn = true
             hasOnboarded = true
+        } else {
+            vm.goToNextPage()
         }
     }
 }

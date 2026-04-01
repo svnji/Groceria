@@ -9,7 +9,7 @@ import SwiftUI
 
 struct forgotPassword: View {
     
-    @State var emailTextFieldText = ""
+    @StateObject private var vm = ForgotPasswordViewModel()
     @State var goToCreate = false
     @Environment(\.dismiss) private var dismiss
     
@@ -27,10 +27,12 @@ struct forgotPassword: View {
                     .foregroundStyle(.grayScale70)
             }
             
-            K.AppTextField(title: "E-mail", placeHolder: "Enter your email", text: $emailTextFieldText)
+            K.AppTextField(title: "E-mail", placeHolder: "Enter your email", text: $vm.email)
             
             K.ButtonView(imageName: "", text: "Continue") {
-                goToCreate = true
+                vm.continueFlow {
+                    goToCreate = true
+                }
             }
             
         }

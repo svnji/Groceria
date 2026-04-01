@@ -11,17 +11,9 @@ struct OTPView: View {
 
     // MARK: - Properties
 
-    @State private var showOverlay = false
+    @StateObject private var vm = OTPViewModel()
     @Environment(\.dismiss) private var dismiss
-    @State private var enterValue: [String]
     @FocusState private var fieldFocus: Int?
-    
-    
-    // MARK: - Init
-
-    init() {
-        _enterValue = State(initialValue: Array(repeating: "", count: 4))
-    }
 
     // MARK: - Body
 
@@ -48,7 +40,7 @@ struct OTPView: View {
                         
                         ForEach(0..<4, id: \.self) { index in
                             
-                            TextField("", text: $enterValue[index])
+                            TextField("", text: $vm.enterValue[index])
                                 .frame(width: 56, height: 56)
                                 .background(
                                     RoundedRectangle(cornerRadius: 24)
@@ -58,26 +50,8 @@ struct OTPView: View {
                                 .keyboardType(.numberPad)
                                 .focused($fieldFocus, equals: index)
                             
-                                .onChange(of: enterValue[index]) { _, newValue in
-                                    
-                                    // Allow only one digit
-                                    if newValue.count > 1 {
-                                        enterValue[index] = String(newValue.prefix(1))
-                                    }
-                                    
-                                    // Move forward
-                                    if !newValue.isEmpty {
-                                        if index < 3 {
-                                            fieldFocus = index + 1
-                                        } else {
-                                            fieldFocus = nil
-                                            verifyOTP()
-                                        }
-                                    }
-                                    // Move backward
-                                    else if index > 0 {
-                                        fieldFocus = index - 1
-                                    }
+                                .onChange(of: vm.enterValue[index]) { _, newValue in
+                                    fieldFocus = vm.handleOTPChange(at: index, newValue: newValue)
                                 }
                         }
                     }
@@ -85,7 +59,7 @@ struct OTPView: View {
                     // Continue Button
                     K.ButtonView(imageName: "", text: "Continue") {
                         withAnimation(.easeInOut) {
-                                showOverlay = true
+                                vm.showOverlay = true
                             }
                     }
                     
@@ -107,10 +81,10 @@ struct OTPView: View {
                     fieldFocus = 0
                 }
             }
-            .blur(radius: showOverlay ? 8 : 0)
-            .disabled(showOverlay)
+            .blur(radius: vm.showOverlay ? 8 : 0)
+            .disabled(vm.showOverlay)
             
-            if showOverlay {
+            if vm.showOverlay {
                 ZStack {
                     Color.black.opacity(0.3)
                         .ignoresSafeArea()
@@ -119,7 +93,7 @@ struct OTPView: View {
                 .transition(.opacity.combined(with: .scale))
             }
         }
-        .animation(.easeInOut, value: showOverlay)
+        .animation(.easeInOut, value: vm.showOverlay)
         .navigationBarBackButtonHidden(true)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -131,13 +105,6 @@ struct OTPView: View {
                 }
             }
         }
-    }
-
-    // MARK: - OTP Logic
-
-    private func verifyOTP() {
-        let otp = enterValue.joined()
-        print("Entered OTP:", otp)
     }
 }
 
