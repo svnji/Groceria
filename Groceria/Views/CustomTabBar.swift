@@ -17,7 +17,7 @@ struct CustomTabBar: View {
             if vm.index == 0 {
                 HomeView()
             } else if vm.index == 1 {
-                DiscoveryView()
+                CartView()
             } else if vm.index == 2 {
                 ItemsView()
             } else if vm.index == 3 {

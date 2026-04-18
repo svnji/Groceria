@@ -10,17 +10,19 @@ final class SignInViewModel: ObservableObject {
     }
 
     func signIn(completion: @escaping (Bool) -> Void) {
-        AuthManager.shared.signIn(
-            email: email,
-            password: password
-        ) { result in
-            switch result {
-            case .success(let user):
-                print("Logged in:", user.uid)
-                completion(true)
-            case .failure(let error):
-                print(error.localizedDescription)
-                completion(false)
+        guard !email.isEmptyOrWhitespace, email.isEmail, password.isValidPassword else {
+            completion(false)
+            return
+        }
+        Task {
+            do {
+                _ = try await AuthManager.shared.login(
+                    email: email.trimmingCharacters(in: .whitespacesAndNewlines),
+                    password: password
+                )
+                await MainActor.run { completion(true) }
+            } catch {
+                await MainActor.run { completion(false) }
             }
         }
     }

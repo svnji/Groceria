@@ -11,12 +11,12 @@ struct RegisterView: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    @AppStorage("firstName") var firstNameTextFieldText: String = ""
-    @AppStorage("lastName") var lastNameTextFieldText: String = ""
+    @AppStorage("isLoggedIn") private var isLoggedIn = false
+
     @StateObject private var vm = RegisterViewModel()
 
     @State private var goToLogin = false
-    @State private var goToOtp = false
+    @State private var errorMessage: String?
 
     var body: some View {
 
@@ -32,13 +32,13 @@ struct RegisterView: View {
                     K.AppTextField(
                         title: "First Name",
                         placeHolder: "Enter your first name",
-                        text: $firstNameTextFieldText
+                        text: $vm.firstNameTextFieldText
                     )
 
                     K.AppTextField(
                         title: "Last Name",
                         placeHolder: "Enter your last name",
-                        text: $lastNameTextFieldText
+                        text: $vm.lastNameTextFieldText
                     )
 
                     K.AppTextField(
@@ -60,10 +60,22 @@ struct RegisterView: View {
                     )
                 }
 
+                if let errorMessage {
+                    Text(errorMessage)
+                        .font(.custom("PlusJakartaSans-Medium", size: 13))
+                        .foregroundStyle(.error)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                }
+
                 K.ButtonView(imageName: "", text: "Sign Up") {
-                    vm.signUp { success in
-                        if success {
-                            goToOtp = true
+                    errorMessage = nil
+                    vm.signUp { result in
+                        switch result {
+                        case .success:
+                            isLoggedIn = true
+                        case .failure(let error):
+                            errorMessage = error.localizedDescription
                         }
                     }
                 }
@@ -81,16 +93,10 @@ struct RegisterView: View {
             .padding()
         }
 
-        // Navigation destinations
-        .navigationDestination(isPresented: $goToOtp) {
-            OTPView()
-        }
         .navigationDestination(isPresented: $goToLogin) {
             SignInView()
         }
 
-        // Navigation modifiers OUTSIDE ScrollView
-        //.navigationTitle("Sign Up")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
 

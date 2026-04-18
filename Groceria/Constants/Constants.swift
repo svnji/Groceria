@@ -73,5 +73,14 @@ struct K{
         }
     }
     
+    struct Urls {
+
+        
+        static let base = URL(string: "https://test.manfazy.com/public/api")!
+
+        static let register = base.appendingPathComponent("register")
+        static let login = base.appendingPathComponent("login")
+    }
+    
 }
 

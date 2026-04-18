@@ -15,7 +15,6 @@ struct SignInView: View {
     
     @State private var goToForgetPassword = false
     @State private var goToSignup = false
-    @State private var goToHome = false
     
     @StateObject private var vm = SignInViewModel()
     
@@ -59,7 +58,6 @@ struct SignInView: View {
                         vm.signIn { success in
                             if success {
                                 isLoggedIn = true
-                                goToHome = true
                             }
                         }
                     }
@@ -126,9 +124,6 @@ struct SignInView: View {
                 }
                 .navigationDestination(isPresented: $goToForgetPassword) {
                     forgotPassword()
-                }
-                .navigationDestination(isPresented: $goToHome) {
-                    HomeView()
                 }
             }
         }

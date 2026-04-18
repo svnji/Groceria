@@ -129,11 +129,14 @@ extension ProductModel {
     /// Resolves `image` when the API returns a full URL or a site-relative path.
     var resolvedImageURL: URL? {
         guard let raw = image?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty else { return nil }
-        // REVIEW: API often returns something like `/uploads/products/...`.
-        // This converts it into a full URL so `AsyncImage(url:)` can load it.
+        // API often returns something like `/uploads/products/...`.
+        // This converts it into a full URL from the configured API host.
         if raw.lowercased().hasPrefix("http") { return URL(string: raw) }
         let path = raw.hasPrefix("/") ? raw : "/" + raw
-        return URL(string: "https://alhebafruits.com" + path)
+        var components = URLComponents(url: K.Urls.base, resolvingAgainstBaseURL: false)
+        components?.path = ""
+        let hostBase = components?.url?.absoluteString.trimmingCharacters(in: CharacterSet(charactersIn: "/")) ?? ""
+        return URL(string: hostBase + path)
     }
     
     var displayPrice: String {

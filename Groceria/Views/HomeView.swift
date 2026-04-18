@@ -151,6 +151,10 @@ struct HomeView: View {
 }
 
 struct ItemView: View {
+    
+    
+
+    
     var imageName: String
     var name: String
     
@@ -176,6 +180,7 @@ struct BestSellerItemView: View {
     // Static best-seller UI changed to be dynamic.
     // This view now renders values from the decoded `ProductModel`.
     let product: ProductModel
+    @EnvironmentObject var cart: CartManager
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -238,7 +243,13 @@ struct BestSellerItemView: View {
                     .font(.custom("PlusJakartaSans-Medium", size: 12))
                     .foregroundStyle(.grayScale70)
                 
+                Spacer()
+                
                 Button {
+                    if let id = product.id {
+                           cart.addToCart(productId: id)
+                           print("Added to cart: \(product.name ?? "Unknown")")
+                       }
                 } label: {
                     Image(systemName: "plus")
                         .foregroundStyle(.primaryApp)
@@ -247,8 +258,8 @@ struct BestSellerItemView: View {
                             RoundedRectangle(cornerRadius: 12)
                                 .foregroundStyle(.secondaryApp)
                         )
-                        .offset(x: 45)
                 }
+                .buttonStyle(.plain)
             }
         }
     }
@@ -257,4 +268,5 @@ struct BestSellerItemView: View {
 #Preview {
     HomeView()
         .environmentObject(HomeViewModel())
+        .environmentObject(CartManager())
 }

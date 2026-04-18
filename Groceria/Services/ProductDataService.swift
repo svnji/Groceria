@@ -24,7 +24,7 @@ class ProductDataService {
 
     private func getProducts() {
         
-        guard let url = URL(string: "https://alhebafruits.com/api/products") else { return }
+        let url = K.Urls.base.appendingPathComponent("products")
         
         productSubscription = URLSession.shared.dataTaskPublisher(for: url)
             .subscribe(on: DispatchQueue.global(qos: .default))
