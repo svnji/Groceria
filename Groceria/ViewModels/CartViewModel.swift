@@ -58,7 +58,7 @@ final class CartViewModel: ObservableObject {
             }
             await loadCart()
         } catch {
-            print("Decrease cart error:", error)
+            print("Decrease cart error:", error.localizedDescription)
         }
     }
 
@@ -67,7 +67,7 @@ final class CartViewModel: ObservableObject {
             try await CartService.shared.removeFromCart(cartItemId: item.id)
             await loadCart()
         } catch {
-            print("Remove cart error:", error)
+            print("Remove cart error:", error.localizedDescription)
         }
     }
 }

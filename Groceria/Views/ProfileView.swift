@@ -8,53 +8,173 @@
 import SwiftUI
 
 struct ProfileView: View {
-
+    
     @AppStorage("isLoggedIn") private var isLoggedIn = true
     @AppStorage("firstName") private var firstName = ""
     @AppStorage("lastName") private var lastName = ""
-
+    @EnvironmentObject var router: AppRouter
+    
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                Text("Profile")
-                    .font(.custom("PlusJakartaSans-Bold", size: 24))
-                    .padding(.top, 8)
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Signed in as")
-                        .font(.custom("PlusJakartaSans-Medium", size: 14))
-                        .foregroundStyle(.grayScale70)
-                    Text("\(firstName) \(lastName)".trimmingCharacters(in: .whitespaces))
-                        .font(.custom("PlusJakartaSans-SemiBold", size: 18))
-                        .foregroundStyle(.primary)
+                //                Text("Profile")
+                //                    .font(.custom("PlusJakartaSans-Bold", size: 24))
+                //                    .padding(.top, 8)
+                //
+                //                VStack(alignment: .leading, spacing: 4) {
+                //                    Text("Signed in as")
+                //                        .font(.custom("PlusJakartaSans-Medium", size: 14))
+                //                        .foregroundStyle(.grayScale70)
+                //                    Text("\(firstName) \(lastName)".trimmingCharacters(in: .whitespaces))
+                //                        .font(.custom("PlusJakartaSans-SemiBold", size: 18))
+                //                        .foregroundStyle(.primary)
+                //                }
+                //                .frame(maxWidth: .infinity, alignment: .leading)
+                //                .padding()
+                //                .background(.secondaryApp)
+                //                .clipShape(RoundedRectangle(cornerRadius: 24))
+                //
+                //
+                //
+                
+                
+                HStack {
+                    Image("profilePic")
+                    
+                    VStack(alignment: .leading) {
+                        Text("\(firstName) \(lastName)")
+                            .font(.custom("PlusJakartaSans-Regular", size: 24))
+                    }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
-                .background(.secondaryApp)
-                .clipShape(RoundedRectangle(cornerRadius: 24))
-
+                
+                Text("Personal Info")
+                    .font(.custom("PlusJakartaSans-Medium", size: 12))
+                    .foregroundStyle(.commonGray)
+                
+                
+                VStack {
+                    Button {
+                        router.goTo(.user)
+                    } label: {
+                        HStack {
+                            Image(systemName: "person")
+                            
+                            Text("Profile")
+                            
+                            Spacer()
+                            
+                            Image(systemName: "chevron.right")
+                        }
+                    }.buttonStyle(.plain)
+                }.padding()
+                
+                Text("Security")
+                    .font(.custom("PlusJakartaSans-Medium", size: 12))
+                    .foregroundStyle(.commonGray)
+                
+                
+                
+                VStack {
+                    Button {
+                        router.goTo(.newPassword)
+                    } label: {
+                        HStack {
+                            Image(systemName: "lock")
+                            
+                            Text("Change Password")
+                            
+                            Spacer()
+                            
+                            Image(systemName: "chevron.right")
+                        }
+                    }.buttonStyle(.plain)
+                        .padding(.vertical)
+                    
+                    
+                    Button {
+                        
+                    } label: {
+                        HStack {
+                            Image(systemName: "lock.open")
+                            
+                            Text("Forgot Password")
+                            
+                            Spacer()
+                            
+                            Image(systemName: "chevron.right")
+                        }
+                    }.buttonStyle(.plain)
+                        .padding(.vertical)
+                    
+                }.padding()
+                
+                Text("General")
+                    .font(.custom("PlusJakartaSans-Medium", size: 12))
+                    .foregroundStyle(.commonGray)
+                
+                
                 Button {
-                    AuthManager.shared.signOut()
-                    isLoggedIn = false
+                    
                 } label: {
-                    Text("Log out")
-                        .font(.custom("PlusJakartaSans-SemiBold", size: 16))
-                        .foregroundStyle(.error)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: 24)
-                                .strokeBorder(Color.error, lineWidth: 1.5)
-                        )
+                    HStack {
+                        Image(systemName: "globe")
+                        
+                        Text("Language")
+                        
+                        Spacer()
+                        
+                        Image(systemName: "chevron.right")
+                    }
+                }.buttonStyle(.plain)
+                    .padding()
+                
+
+                Text("About")
+                    .font(.custom("PlusJakartaSans-Medium", size: 12))
+                    .foregroundStyle(.commonGray)
+                
+                
+                Button {
+                    
+                } label: {
+                    HStack {
+                        Image(systemName: "questionmark.circle")
+                        
+                        Text("Help & Support")
+                        
+                        Spacer()
+                        
+                        Image(systemName: "chevron.right")
+                    }
+                }.buttonStyle(.plain)
+                    .padding()
+                
+                
+                
+                Spacer()
+                
+                    Button {
+                        AuthManager.shared.signOut()
+                        isLoggedIn = false
+                    } label: {
+                        Text("Log out")
+                            .font(.custom("PlusJakartaSans-SemiBold", size: 16))
+                            .foregroundStyle(.primaryApp)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(
+                                RoundedRectangle(cornerRadius: 24)
+                                    .strokeBorder(Color.primaryApp, lineWidth: 1.5)
+                            )
+                    }
+                    .padding(.top, 8)
                 }
-                .padding(.top, 8)
+                .padding(.horizontal, 24)
+                .padding(.bottom, 32)
             }
-            .padding(.horizontal, 24)
-            .padding(.bottom, 32)
+            .frame(maxWidth: .infinity)
         }
-        .frame(maxWidth: .infinity)
     }
-}
 
 #Preview {
     ProfileView()
