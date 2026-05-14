@@ -47,6 +47,7 @@ final class CartViewModel: ObservableObject {
     }
 
     func decrease(item: CartItem) async {
+        print(" quantity raw value: '\(item.quantity)'") 
         guard let productId = item.product.id else { return }
         guard let currentQty = Int(item.quantity), currentQty > 0 else { return }
 
@@ -54,7 +55,7 @@ final class CartViewModel: ObservableObject {
             if currentQty == 1 {
                 try await CartService.shared.removeFromCart(cartItemId: item.id)
             } else {
-                try await CartService.shared.setQuantity(productId: productId, amount: currentQty - 1)
+                try await CartService.shared.setQuantity(productId: productId, amount: Double(currentQty - 1))
             }
             await loadCart()
         } catch {

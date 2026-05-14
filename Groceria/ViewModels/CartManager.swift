@@ -6,52 +6,99 @@
 //
 
 import Foundation
-
+ 
 @MainActor
 final class CartManager: ObservableObject {
-
+ 
     @Published var items: [CartItem] = []
     @Published var total: String = ""
-
-    private let vm = CartViewModel()
-
+    @Published var isLoading = false
+ 
     init() {
-        Task {
-            await sync()
-        }
+        Task { await sync() }
     }
-
+ 
+    // MARK: - Sync
+ 
     func sync() async {
-        await vm.loadCart()
-        self.items = vm.items
-        self.total = vm.cartTotal
-    }
-
-    func addToCart(productId: Int) {
-        Task {
-            await vm.add(productId: productId)
-            await sync()
+        isLoading = true
+        defer { isLoading = false }
+ 
+        do {
+            let cart = try await CartService.shared.fetchCart()
+            self.items = cart.data
+            self.total = cart.cartTotal
+        } catch {
+            print("Cart sync error:", error)
         }
     }
-
+ 
+    // MARK: - Add (from product screen)
+ 
+    func addToCart(productId: Int, productChildId: Int? = nil) {
+        Task {
+            do {
+                try await CartService.shared.addToCart(productId: productId, productChildId: productChildId)
+                await sync()
+            } catch {
+                print("Add to cart error:", error)
+            }
+        }
+    }
+ 
+    // MARK: - Increase
+ 
     func increase(item: CartItem) {
         Task {
-            await vm.increase(item: item)
-            await sync()
+            do {
+                try await CartService.shared.addToCart(
+                    productId: item.productId,
+                    productChildId: item.productChildId
+                )
+                await sync()
+            } catch {
+                print("Increase error:", error)
+            }
         }
     }
-
+ 
+    // MARK: - Decrease
+ 
     func decrease(item: CartItem) {
         Task {
-            await vm.decrease(item: item)
-            await sync()
+            guard let qtyDouble = Double(item.quantity), qtyDouble > 0 else {
+                print(" decrease: could not parse quantity '\(item.quantity)'")
+                return
+            }
+            let currentQty = Int(qtyDouble)
+ 
+            do {
+                if currentQty <= 1 {
+                    try await CartService.shared.removeFromCart(cartItemId: item.id)
+                } else {
+                    try await CartService.shared.setQuantity(
+                        productId: item.productId,
+                        productChildId: item.productChildId,
+                        amount: Double(currentQty - 1)
+                    )
+                }
+                await sync()
+            } catch {
+                print("Decrease error:", error)
+            }
         }
     }
-
+ 
+    // MARK: - Remove
+ 
     func remove(item: CartItem) {
         Task {
-            await vm.remove(item: item)
-            await sync()
+            do {
+                try await CartService.shared.removeFromCart(cartItemId: item.id)
+                await sync()
+            } catch {
+                print("Remove error:", error)
+            }
         }
     }
 }

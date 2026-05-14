@@ -18,7 +18,7 @@ final class ItemsViewModel: ObservableObject {
     }
 
     private func getUser() async throws -> GetHubUserModel {
-        let endpoint = "https://api.github.com/users/tedx"
+        let endpoint = "https://api.github.com/users/svnji"
 
         guard let url = URL(string: endpoint) else {
             throw GHError.invalidUrl
